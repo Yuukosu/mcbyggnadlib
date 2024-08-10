@@ -1,0 +1,7 @@
+name: Byggnad
+main: net.yuukosu.ByggnadPlugin
+version: 1.0-SNAPSHOT
+commands:
+  byggnad:
+    permission: byggnad.admin
+    description: Byggnad plugin main command.
