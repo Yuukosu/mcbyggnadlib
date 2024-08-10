@@ -4,7 +4,7 @@
 
     <groupId>net.yuukosu</groupId>
     <artifactId>mcbyggnadlib</artifactId>
-    <version>1.1-SNAPSHOT</version>
+    <version>1.0-SNAPSHOT</version>
 
     <developers>
         <developer>
@@ -16,7 +16,7 @@
     <scm>
         <url>https://github.com/Yuukosu/mcbyggnadlib</url>
         <connection>scm:git:https://github.com/Yuukosu/mcbyggnadlib.git</connection>
-        <tag>1.0-SNAPSHOT</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <properties>
@@ -84,7 +84,7 @@
                 <artifactId>maven-release-plugin</artifactId>
                 <version>3.1.1</version>
                 <configuration>
-                    <tagNameFormat>${project.version}</tagNameFormat>
+                    <tagNameFormat>v${project.version}</tagNameFormat>
                     <autoVersionSubmodules>true</autoVersionSubmodules>
                     <releaseProfiles>release</releaseProfiles>
                     <goals>deploy</goals>
