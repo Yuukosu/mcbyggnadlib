@@ -12,7 +12,7 @@ Minecraft buildings data serialization library for Spigot.
 <dependency>
     <groupId>com.github.Yuukosu</groupId>
     <artifactId>mcbyggnadlib</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>v1.0-SNAPSHOT</version>
 </dependency>
 ```
 
