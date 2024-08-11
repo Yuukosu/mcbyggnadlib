@@ -1,7 +1,6 @@
 package net.yuukosu.data;
 
 import com.google.common.collect.LinkedListMultimap;
-import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.bukkit.Location;
@@ -12,7 +11,6 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Getter
-@AllArgsConstructor
 @EqualsAndHashCode
 public class ByggnadData {
 
@@ -25,6 +23,11 @@ public class ByggnadData {
     private ByggnadData() {
         this.blockPallet = new LinkedHashSet<>();
         this.blockDataList = LinkedListMultimap.create();
+    }
+
+    public ByggnadData(Set<BlockData> blockPallet, LinkedListMultimap<RelLocationData, Integer> blockDataList) {
+        this.blockPallet = blockPallet;
+        this.blockDataList = blockDataList;
     }
 
     public void byggnad(Location center) {
