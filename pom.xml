@@ -4,7 +4,7 @@
 
     <groupId>net.yuukosu</groupId>
     <artifactId>mcbyggnadlib</artifactId>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.1</version>
 
     <developers>
         <developer>
@@ -16,7 +16,7 @@
     <scm>
         <url>https://github.com/Yuukosu/mcbyggnadlib</url>
         <connection>scm:git:https://github.com/Yuukosu/mcbyggnadlib.git</connection>
-        <tag>HEAD</tag>
+        <tag>v1.0.1-SNAPSHOT</tag>
     </scm>
 
     <properties>
