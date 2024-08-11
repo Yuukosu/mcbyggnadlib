@@ -19,6 +19,9 @@ public class ByggnadData {
     private final Set<BlockData> blockPallet;
     private final LinkedListMultimap<RelLocationData, Integer> blockDataList;
 
+    private int width = -1;
+    private int height = -1;
+
     private ByggnadData() {
         this.blockPallet = new LinkedHashSet<>();
         this.blockDataList = LinkedListMultimap.create();
@@ -30,6 +33,40 @@ public class ByggnadData {
             Location location = entry.getKey().toLocation(center);
             blockData.place(location);
         });
+    }
+
+    public int getWidth() {
+        return this.getWidth(false);
+    }
+
+    public int getHeight() {
+        return this.getHeight(false);
+    }
+
+    @SuppressWarnings("deprecation")
+    public int getWidth(boolean ignoreAir) {
+        if (this.width == -1) {
+            this.width = this.blockDataList.entries().parallelStream()
+                    .filter(entry -> Material.AIR.getId() != this.blockPallet.toArray(BlockData[]::new)[entry.getValue()].getBlockId())
+                    .mapToInt(entry -> Math.max(Math.abs(entry.getKey().getRelX()), Math.abs(entry.getKey().getRelZ())))
+                    .max()
+                    .orElse(-1);
+        }
+
+        return this.width;
+    }
+
+    @SuppressWarnings("deprecation")
+    public int getHeight(boolean ignoreAir) {
+        if (this.height == -1) {
+            this.height = this.blockDataList.entries().parallelStream()
+                    .filter(entry -> Material.AIR.getId() != this.blockPallet.toArray(BlockData[]::new)[entry.getValue()].getBlockId())
+                    .mapToInt(entry -> entry.getKey().getRelY())
+                    .max()
+                    .orElse(-1);
+        }
+
+        return this.height;
     }
 
     public static ByggnadData create(Location center, Location pos1, Location pos2, boolean skipAir) {
