@@ -68,7 +68,7 @@ public class ByggnadCommand implements CommandExecutor, TabCompleter {
                     player.sendMessage("§7Loading...");
 
                     Byggnad byggnad = byggnadList.get(name);
-                    byggnad.byggnad(player.getLocation());
+                    byggnad.byggnad(player.getLocation(), true);
 
                     player.sendMessage("§aDone!");
                     player.playSound(player.getLocation(), Sound.NOTE_PLING, 1.0F, 2.0F);
@@ -78,11 +78,6 @@ public class ByggnadCommand implements CommandExecutor, TabCompleter {
             } else if (args[0].equalsIgnoreCase("save")) {
                 if (args.length > 1) {
                     String name = args[1].toLowerCase();
-
-                    if (byggnadList.containsKey(name)) {
-                        sender.sendMessage(String.format("§c\"%s\" Byggnad Data Already Exists.", name));
-                        return true;
-                    }
 
                     if (!pos1.containsKey(player) || !pos2.containsKey(player)) {
                         sender.sendMessage("§cYou have not selected a section.");
@@ -105,7 +100,8 @@ public class ByggnadCommand implements CommandExecutor, TabCompleter {
                     Byggnad byggnad = Byggnad.createInstance(player.getLocation(), pos1.get(player), pos2.get(player), skipAir);
 
                     if (!ByggnadPlugin.getByggnadList().containsKey(name)) {
-                        ByggnadPlugin.getInstance().addByggnadData(name, byggnad);
+                        ByggnadPlugin.getInstance().addByggnad(name, byggnad);
+                        ByggnadPlugin.getInstance().saveByggnads();
                         player.sendMessage("§aDone!");
                         player.playSound(player.getLocation(), Sound.NOTE_PLING, 1.0F, 2.0F);
                     } else {

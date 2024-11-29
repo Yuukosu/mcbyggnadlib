@@ -34,7 +34,6 @@ public Byggnad createByggnadData(Location center, Location corner1, Location cor
 
 ```java
 import net.yuukosu.data.Byggnad;
-import net.yuukosu.data.ByggnadSerializer;
 
 public byte[] serializeBuildingData(Byggnad byggnad) {
     return ByggnadSerializer.getInstance().serialize(byggnad);

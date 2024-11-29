@@ -1,28 +1,34 @@
 package net.yuukosu;
 
 import net.yuukosu.data.Byggnad;
-import net.yuukosu.data.ByggnadSerializer;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.file.Files;
 
+@SuppressWarnings("unused")
 public class ByggnadLib {
 
-//    public static Byggnad load(File file) throws IOException {
-//        try (FileInputStream fis = new FileInputStream(file)) {
-//            return ByggnadSerializer.getInstance().deserialize(fis);
-//        }
-//    }
-//
-//    public static void save(Byggnad byggnad, File file) throws IOException {
-//        if (!file.exists() || !file.isFile()) {
-//            Files.createFile(file.toPath());
-//        }
-//
-//        try (FileOutputStream fos = new FileOutputStream(file)) {
-//            byte[] serialized = ByggnadSerializer.getInstance().serialize(byggnad);
-//            fos.write(serialized);
-//            fos.flush();
-//        }
-//    }
+    public static Byggnad load(File file) throws IOException {
+        try (FileInputStream fis = new FileInputStream(file)) {
+            return Byggnad.unpack(fis.readAllBytes());
+        }
+    }
+
+    public static Byggnad load(byte[] data) {
+        return Byggnad.unpack(data);
+    }
+
+    public static void save(Byggnad byggnad, File output) throws IOException {
+        if (!output.exists() || !output.isFile()) {
+            Files.createFile(output.toPath());
+        }
+
+        try (FileOutputStream fos = new FileOutputStream(output)) {
+            fos.write(byggnad.pack());
+            fos.flush();
+        }
+    }
 }
