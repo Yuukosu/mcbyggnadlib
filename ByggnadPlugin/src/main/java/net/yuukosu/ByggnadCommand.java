@@ -1,7 +1,7 @@
 package net.yuukosu;
 
 import com.google.common.collect.ImmutableSet;
-import net.yuukosu.data.ByggnadData;
+import net.yuukosu.data.Byggnad;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -48,7 +48,7 @@ public class ByggnadCommand implements CommandExecutor, TabCompleter {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        Map<String, ByggnadData> byggnadList = ByggnadPlugin.getByggnadList();
+        Map<String, Byggnad> byggnadList = ByggnadPlugin.getByggnadList();
 
         if (args.length > 0) {
             if (!(sender instanceof Player player)) {
@@ -67,8 +67,8 @@ public class ByggnadCommand implements CommandExecutor, TabCompleter {
 
                     player.sendMessage("§7Loading...");
 
-                    ByggnadData byggnadData = byggnadList.get(name);
-                    byggnadData.byggnad(player.getLocation());
+                    Byggnad byggnad = byggnadList.get(name);
+                    byggnad.byggnad(player.getLocation());
 
                     player.sendMessage("§aDone!");
                     player.playSound(player.getLocation(), Sound.NOTE_PLING, 1.0F, 2.0F);
@@ -102,14 +102,14 @@ public class ByggnadCommand implements CommandExecutor, TabCompleter {
 
                     player.sendMessage("§7Saving...");
 
-                    ByggnadData byggnadData = ByggnadData.create(player.getLocation(), pos1.get(player), pos2.get(player), skipAir);
-                    ByggnadPlugin.getInstance().addByggnadData(name, byggnadData);
+                    Byggnad byggnad = Byggnad.createInstance(player.getLocation(), pos1.get(player), pos2.get(player), skipAir);
 
-                    if (ByggnadPlugin.getInstance().save(name)) {
+                    if (!ByggnadPlugin.getByggnadList().containsKey(name)) {
+                        ByggnadPlugin.getInstance().addByggnadData(name, byggnad);
                         player.sendMessage("§aDone!");
                         player.playSound(player.getLocation(), Sound.NOTE_PLING, 1.0F, 2.0F);
                     } else {
-                        player.sendMessage("§cFailed to save byggnad data.");
+                        player.sendMessage("§cWhat?");
                     }
                 } else {
                     this.printUsage(sender, command);

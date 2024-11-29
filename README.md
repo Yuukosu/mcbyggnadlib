@@ -21,31 +21,32 @@ Minecraft buildings data serialization library for Spigot.
 ### Create Building Data
 
 ```java
+import net.yuukosu.data.Byggnad;
 import net.yuukosu.data.ByggnadData;
 import org.bukkit.Location;
 
-public ByggnadData createByggnadData(Location center, Location corner1, Location corner2) {
-    return ByggnadData.create(center, corner1, corner2);
+public Byggnad createByggnadData(Location center, Location corner1, Location corner2) {
+    return Byggnad.create(center, corner1, corner2);
 }
 ```
 
 ### Serialize
 
 ```java
-import net.yuukosu.data.ByggnadData;
-import net.yuukosu.data.serialization.ByggnadSerializer;
+import net.yuukosu.data.Byggnad;
+import net.yuukosu.data.ByggnadSerializer;
 
-public byte[] serializeBuildingData(ByggnadData byggnadData) {
-    return ByggnadSerializer.getInstance().serialize(byggnadData);
+public byte[] serializeBuildingData(Byggnad byggnad) {
+    return ByggnadSerializer.getInstance().serialize(byggnad);
 }
 ```
 
 ### Deserialize
 
 ```java
-import net.yuukosu.data.ByggnadData;
+import net.yuukosu.data.Byggnad;
 
-public ByggnadData deserializeBuildingData(byte[] serialized) {
+public Byggnad deserializeBuildingData(byte[] serialized) {
     return ByggnadSerializer.getInstance().deserialize(serialized);
 }
 ```
@@ -56,8 +57,8 @@ public ByggnadData deserializeBuildingData(byte[] serialized) {
 import net.yuukosu.ByggnadLib;
 import java.io.IOException;
 
-public void save(ByggnadData byggnadData) throws IOException {
-    ByggnadLib.save(byggnadData);
+public void save(ByggnadData byggnad) throws IOException {
+    ByggnadLib.save(byggnad);
 }
 ```
 
@@ -65,11 +66,12 @@ public void save(ByggnadData byggnadData) throws IOException {
 
 ```java
 import net.yuukosu.ByggnadLib;
-import net.yuukosu.data.ByggnadData;
+import net.yuukosu.data.Byggnad;
+
 import java.io.File;
 import java.io.IOException;
 
-public ByggnadData loadBuildingDataFromFile(File file) throws IOException {
+public Byggnad loadBuildingDataFromFile(File file) throws IOException {
     return ByggnadLib.load(file);
 }
 ```
@@ -77,10 +79,10 @@ public ByggnadData loadBuildingDataFromFile(File file) throws IOException {
 ### Generate a building
 
 ```java
-import net.yuukosu.data.ByggnadData;
+import net.yuukosu.data.Byggnad;
 import org.bukkit.Location;
 
-public void generateBuildingData(ByggnadData byggnadData, Location center) {
-    byggnadData.byggnad(center);
+public void generateBuildingData(Byggnad byggnad, Location center) {
+    byggnad.byggnad(center);
 }
 ```
