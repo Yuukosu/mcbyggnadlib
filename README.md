@@ -12,7 +12,7 @@ Minecraft buildings data serialization library for Spigot.
 <dependency>
     <groupId>com.github.Yuukosu</groupId>
     <artifactId>mcbyggnadlib</artifactId>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>2.0.0-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -25,7 +25,7 @@ import net.yuukosu.data.Byggnad;
 import net.yuukosu.data.ByggnadData;
 import org.bukkit.Location;
 
-public Byggnad createByggnadData(Location center, Location corner1, Location corner2) {
+public Byggnad createByggnad(Location center, Location corner1, Location corner2) {
     return Byggnad.create(center, corner1, corner2);
 }
 ```
@@ -36,7 +36,7 @@ public Byggnad createByggnadData(Location center, Location corner1, Location cor
 import net.yuukosu.data.Byggnad;
 
 public byte[] serializeBuildingData(Byggnad byggnad) {
-    return ByggnadSerializer.getInstance().serialize(byggnad);
+    return byggnad.pack();
 }
 ```
 
@@ -46,7 +46,7 @@ public byte[] serializeBuildingData(Byggnad byggnad) {
 import net.yuukosu.data.Byggnad;
 
 public Byggnad deserializeBuildingData(byte[] serialized) {
-    return ByggnadSerializer.getInstance().deserialize(serialized);
+    return Byggnad.unpack(serialized);
 }
 ```
 
@@ -81,7 +81,7 @@ public Byggnad loadBuildingDataFromFile(File file) throws IOException {
 import net.yuukosu.data.Byggnad;
 import org.bukkit.Location;
 
-public void generateBuildingData(Byggnad byggnad, Location center) {
-    byggnad.byggnad(center);
+public void generateBuildingData(Byggnad byggnad, Location center, boolean updateChunks) {
+    byggnad.byggnad(center, updateChunks);
 }
 ```
