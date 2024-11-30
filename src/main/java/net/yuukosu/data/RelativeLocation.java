@@ -19,7 +19,12 @@ public class RelativeLocation {
     }
 
     public Location toLocation(Location center) {
-        return new Location(center.getWorld(), center.getBlockX() - this.relativeX, center.getBlockY() - this.relativeY, center.getBlockZ() - this.relativeZ);
+        return new Location(
+                center.getWorld(),
+                center.getBlockX() - this.relativeX,
+                center.getBlockY() - this.relativeY,
+                center.getBlockZ() - this.relativeZ
+        );
     }
 
     public static RelativeLocation create(Location center, Location location) {

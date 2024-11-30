@@ -61,16 +61,15 @@ public class ByggnadCommand implements CommandExecutor, TabCompleter {
                     String name = args[1].toLowerCase();
 
                     if (!byggnadList.containsKey(name)) {
-                        sender.sendMessage(String.format("§cNo Byggnad Data Found For \"%s\"", name));
+                        sender.sendMessage(String.format("§cNo byggnad data found for \"%s\".", name));
                         return true;
                     }
 
                     player.sendMessage("§7Loading...");
-
                     Byggnad byggnad = byggnadList.get(name);
                     byggnad.byggnad(player.getLocation(), true);
-
                     player.sendMessage("§aDone!");
+                    player.sendMessage(String.format("size: §a%,dx%,d", byggnad.getByggnadWidth(), byggnad.getByggnadHeight()));
                     player.playSound(player.getLocation(), Sound.NOTE_PLING, 1.0F, 2.0F);
                 } else {
                     this.printUsage(sender, command);
@@ -98,15 +97,12 @@ public class ByggnadCommand implements CommandExecutor, TabCompleter {
                     player.sendMessage("§7Saving...");
 
                     Byggnad byggnad = Byggnad.createInstance(player.getLocation(), pos1.get(player), pos2.get(player), skipAir);
-
-                    if (!ByggnadPlugin.getByggnadList().containsKey(name)) {
-                        ByggnadPlugin.getInstance().addByggnad(name, byggnad);
-                        ByggnadPlugin.getInstance().saveByggnads();
-                        player.sendMessage("§aDone!");
-                        player.playSound(player.getLocation(), Sound.NOTE_PLING, 1.0F, 2.0F);
-                    } else {
-                        player.sendMessage("§cWhat?");
-                    }
+                    ByggnadPlugin instance = ByggnadPlugin.getInstance();
+                    instance.addByggnad(name, byggnad);
+                    instance.saveByggnads();
+                    player.sendMessage("§aDone!");
+                    player.sendMessage(String.format("size: §a%,dx%,d", byggnad.getByggnadWidth(), byggnad.getByggnadHeight()));
+                    player.playSound(player.getLocation(), Sound.NOTE_PLING, 1.0F, 2.0F);
                 } else {
                     this.printUsage(sender, command);
                 }
