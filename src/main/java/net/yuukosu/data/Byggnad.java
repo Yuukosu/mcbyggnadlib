@@ -124,7 +124,7 @@ public class Byggnad {
     private static final byte[] MAGIC = "BYGGNAD".getBytes();
 
     private int getPackedHeaderSize() {
-        return MAGIC.length + (Short.SIZE * 4) / 8;
+        return MAGIC.length + (Integer.SIZE * 2) + (Short.SIZE * 2) / 8;
     }
 
     private int getPackedPalletSize() {
@@ -138,8 +138,8 @@ public class Byggnad {
     public byte[] pack() {
         ByteBuffer headerBuf = ByteBuffer.allocate(this.getPackedHeaderSize());
         headerBuf.put(MAGIC);
-        headerBuf.putShort((short) this.pallet.size());
-        headerBuf.putShort((short) this.blocks.size());
+        headerBuf.putInt(this.pallet.size());
+        headerBuf.putInt(this.blocks.size());
         headerBuf.putShort(this.byggnadWidth);
         headerBuf.putShort(this.byggnadHeight);
         headerBuf.flip();
@@ -174,8 +174,8 @@ public class Byggnad {
             return null;
         }
 
-        int palletSize = payload.getShort();
-        int blocksSize = payload.getShort();
+        int palletSize = payload.getInt();
+        int blocksSize = payload.getInt();
         short byggnadWidth = payload.getShort();
         short byggnadHeight = payload.getShort();
 
