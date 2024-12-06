@@ -124,7 +124,7 @@ public class Byggnad {
     private static final byte[] MAGIC = "BYGGNAD".getBytes();
 
     private int getPackedHeaderSize() {
-        return MAGIC.length + (Integer.SIZE * 2) + (Short.SIZE * 2) / 8;
+        return MAGIC.length + ((Integer.SIZE * 2) + (Short.SIZE * 2)) / 8;
     }
 
     private int getPackedPalletSize() {
