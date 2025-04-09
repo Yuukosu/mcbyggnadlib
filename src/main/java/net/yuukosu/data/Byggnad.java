@@ -1,6 +1,7 @@
 package net.yuukosu.data;
 
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.primitives.Bytes;
 import lombok.AllArgsConstructor;
@@ -29,12 +30,14 @@ public class Byggnad {
     private short byggnadWidth;
     private short byggnadHeight;
 
+    private static final byte[] MAGIC = "BYGGNAD".getBytes();
+
     private Byggnad(Location center, Location pos1, Location pos2, boolean excludeAir) {
         int area = Math.abs(pos2.getBlockX() - pos1.getBlockX())
                 * Math.abs(pos2.getBlockY() - pos1.getBlockY())
                 * Math.abs(pos2.getBlockZ() - pos1.getBlockZ());
         this.pallet = new HashMap<>(area);
-        this.blocks = ArrayListMultimap.create();
+        this.blocks = HashMultimap.create();
         this.create(center, pos1, pos2, excludeAir);
     }
 
@@ -80,33 +83,32 @@ public class Byggnad {
         }
     }
 
+    public void byggnad(Location center) {
+        this.byggnad(center, true);
+    }
+
     public void byggnad(final Location center, boolean updateChunks) {
         Set<ChunkSection> changedSections = new HashSet<>();
         Set<net.minecraft.server.v1_8_R3.Chunk> changedChunks = new HashSet<>();
 
-        this.pallet.forEach((key, value) -> {
-            List<Location> locations = this.blocks.get(value).stream()
-                    .map(relativeLocation -> relativeLocation.toLocation(center))
-                    .toList();
-            locations.forEach(location -> {
-                Chunk chunk = location.getChunk();
-                if (!chunk.isLoaded()) chunk.load(true);
-                net.minecraft.server.v1_8_R3.Chunk nmsChunk = ((CraftChunk) chunk).getHandle();
-                int y = location.getBlockY();
-                ChunkSection section = nmsChunk.getSections()[y >> 4];
+        this.pallet.forEach((key, value) -> this.blocks.get(value).stream()
+                .map(relativeLocation -> relativeLocation.toLocation(center))
+                .forEach(location -> {
+                    Chunk chunk = location.getChunk();
+                    if (!chunk.isLoaded()) chunk.load(true);
+                    net.minecraft.server.v1_8_R3.Chunk nmsChunk = ((CraftChunk) chunk).getHandle();
+                    int y = location.getBlockY();
+                    ChunkSection section = nmsChunk.getSections()[y >> 4];
 
-                if (section == null) {
-                    section = nmsChunk.getSections()[y >> 4] = new ChunkSection(y >> 4 << 4, true);
-                }
+                    if (section == null) {
+                        section = nmsChunk.getSections()[y >> 4] = new ChunkSection(y >> 4 << 4, true);
+                    }
 
-                char[] blocks = section.getIdArray();
-                blocks[(location.getBlockX() & 0xF) + ((location.getBlockZ() & 0xF) << 4) + ((location.getBlockY() & 0xF) << 8)] = key.pack();
-                section.a(blocks);
+                    section.getIdArray()[(location.getBlockX() & 0xF) + ((location.getBlockZ() & 0xF) << 4) + ((location.getBlockY() & 0xF) << 8)] = key.pack();
 
-                changedSections.add(section);
-                changedChunks.add(nmsChunk);
-            });
-        });
+                    changedSections.add(section);
+                    changedChunks.add(nmsChunk);
+                }));
 
         changedSections.forEach(ChunkSection::recalcBlockCounts);
         changedChunks.forEach(net.minecraft.server.v1_8_R3.Chunk::initLighting);
@@ -120,8 +122,6 @@ public class Byggnad {
             });
         }
     }
-
-    private static final byte[] MAGIC = "BYGGNAD".getBytes();
 
     private int getPackedHeaderSize() {
         return MAGIC.length + ((Integer.SIZE * 2) + (Short.SIZE * 2)) / 8;
