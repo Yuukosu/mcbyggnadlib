@@ -1,7 +1,9 @@
 package net.yuukosu.data;
 
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import com.google.common.primitives.Bytes;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -14,36 +16,41 @@ import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_8_R3.CraftChunk;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.nio.ByteBuffer;
+import java.util.*;
 
 @Getter
 @EqualsAndHashCode
 @AllArgsConstructor
+@SuppressWarnings("unused")
 public class Byggnad {
 
-    private final Map<ByggnadBlock, Integer> pallet;
-    private final Multimap<Integer, RelativeLocation> blocks;
+    private final Map<ByggnadBlock, Short> pallet;
+    private final Multimap<Short, RelativeLocation> blocks;
+    private short byggnadWidth;
+    private short byggnadHeight;
 
-    private Byggnad(Location center, Location pos1, Location pos2, boolean skipAir) {
+    private static final byte[] MAGIC = "BYGGNAD".getBytes();
+
+    private Byggnad(Location center, Location pos1, Location pos2, boolean excludeAir) {
         int area = Math.abs(pos2.getBlockX() - pos1.getBlockX())
                 * Math.abs(pos2.getBlockY() - pos1.getBlockY())
                 * Math.abs(pos2.getBlockZ() - pos1.getBlockZ());
         this.pallet = new HashMap<>(area);
-        this.blocks = ArrayListMultimap.create();
-        this.create(center, pos1, pos2, skipAir);
+        this.blocks = HashMultimap.create();
+        this.create(center, pos1, pos2, excludeAir);
     }
 
-    public static Byggnad createInstance(Location center, Location pos1, Location pos2, boolean skipAir) {
-        return new Byggnad(center, pos1, pos2, skipAir);
+    public static Byggnad createInstance(Location center, Location pos1, Location pos2, boolean excludeAir) {
+        return new Byggnad(center, pos1, pos2, excludeAir);
     }
 
-    private void create(Location center, Location pos1, Location pos2, boolean skipAir) {
+    private void create(Location center, Location pos1, Location pos2, boolean excludeAir) {
         int maxX = Math.max(pos1.getBlockX(), pos2.getBlockX());
         int maxY = Math.max(pos1.getBlockY(), pos2.getBlockY());
         int maxZ = Math.max(pos1.getBlockZ(), pos2.getBlockZ());
+        this.byggnadWidth = (short) (Math.max(Math.abs(pos1.getBlockX() - pos2.getBlockX()), Math.abs(pos1.getBlockZ() - pos2.getBlockZ())) + 1);
+        this.byggnadHeight = (short) (Math.abs(pos1.getBlockY() - pos2.getBlockY()) + 1);
 
         for (int x = Math.min(pos1.getBlockX(), pos2.getBlockX()); x <= maxX; x++) {
             for (int y = Math.min(pos1.getBlockY(), pos2.getBlockY()); y <= maxY; y++) {
@@ -54,16 +61,16 @@ public class Byggnad {
                     );
                     Block block = location.getBlock();
 
-                    if (skipAir && block.isEmpty()) {
+                    if (excludeAir && block.isEmpty()) {
                         continue;
                     }
 
                     ByggnadBlock byggnadBlock = ByggnadBlock.create(block);
-                    Integer index = this.pallet.get(byggnadBlock);
+                    Short index = this.pallet.get(byggnadBlock);
 
                     if (index == null) {
-                        this.pallet.put(byggnadBlock, this.pallet.size());
-                        index = this.pallet.size() - 1;
+                        this.pallet.put(byggnadBlock, (short) this.pallet.size());
+                        index = (short) (this.pallet.size() - 1);
                     }
 
                     RelativeLocation relativeLocation = RelativeLocation.create(
@@ -76,31 +83,113 @@ public class Byggnad {
         }
     }
 
-    public void byggnad(final Location center) {
-        List<net.minecraft.server.v1_8_R3.Chunk> chunks = new ArrayList<>();
+    public void byggnad(Location center) {
+        this.byggnad(center, true);
+    }
 
-        this.pallet.forEach((key, value) -> {
-            List<Location> locations = this.blocks.get(value).stream()
-                    .map(relativeLocation -> relativeLocation.toLocation(center))
-                    .toList();
-            locations.forEach(location -> {
-                Chunk chunk = location.getChunk();
-                if (!chunk.isLoaded()) chunk.load(true);
-                net.minecraft.server.v1_8_R3.Chunk nmsChunk = ((CraftChunk) chunk).getHandle();
-                ChunkSection section = nmsChunk.getSections()[location.getBlockY() >> 4];
+    public void byggnad(final Location center, boolean updateChunks) {
+        Set<ChunkSection> changedSections = new HashSet<>();
+        Set<net.minecraft.server.v1_8_R3.Chunk> changedChunks = new HashSet<>();
 
-                if (section == null) {
-                    section = nmsChunk.getSections()[location.getBlockY() >> 4] = new ChunkSection(location.getBlockY() >> 4, true, new char[4096]);
+        this.pallet.forEach((key, value) -> this.blocks.get(value).stream()
+                .map(relativeLocation -> relativeLocation.toLocation(center))
+                .forEach(location -> {
+                    Chunk chunk = location.getChunk();
+                    if (!chunk.isLoaded()) chunk.load(true);
+                    net.minecraft.server.v1_8_R3.Chunk nmsChunk = ((CraftChunk) chunk).getHandle();
+                    int y = location.getBlockY();
+                    ChunkSection section = nmsChunk.getSections()[y >> 4];
+
+                    if (section == null) {
+                        section = nmsChunk.getSections()[y >> 4] = new ChunkSection(y >> 4 << 4, true);
+                    }
+
+                    section.getIdArray()[(location.getBlockX() & 0xF) + ((location.getBlockZ() & 0xF) << 4) + ((location.getBlockY() & 0xF) << 8)] = key.pack();
+
+                    changedSections.add(section);
+                    changedChunks.add(nmsChunk);
+                }));
+
+        changedSections.forEach(ChunkSection::recalcBlockCounts);
+        changedChunks.forEach(net.minecraft.server.v1_8_R3.Chunk::initLighting);
+
+        if (updateChunks) {
+            Bukkit.getOnlinePlayers().forEach(player -> {
+                for (net.minecraft.server.v1_8_R3.Chunk chunk : changedChunks) {
+                    PacketPlayOutMapChunk packet = new PacketPlayOutMapChunk(chunk, true, '\uFFFF');
+                    ((CraftPlayer) player).getHandle().playerConnection.sendPacket(packet);
                 }
-
-                char[] blocks = section.getIdArray();
-                blocks[(location.getBlockX() & 0xF) + ((location.getBlockY() & 0xF) << 4) + ((location.getBlockZ() & 0xF) << 8)] = key.pack();
-                section.a(blocks);
-
-                chunks.add(nmsChunk);
             });
-        });
+        }
+    }
 
-        chunks.forEach(chunk -> Bukkit.getOnlinePlayers().forEach(player -> ((CraftPlayer) player).getHandle().playerConnection.sendPacket(new PacketPlayOutMapChunk(chunk, true, '\uFFFF'))));
+    private int getPackedHeaderSize() {
+        return MAGIC.length + ((Integer.SIZE * 2) + (Short.SIZE * 2)) / 8;
+    }
+
+    private int getPackedPalletSize() {
+        return (ByggnadBlock.getPackedSize() + Short.SIZE / 8) * this.pallet.size();
+    }
+
+    private int getPackedBlocksSize() {
+        return (RelativeLocation.getPackedSize() + Short.SIZE / 8) * this.blocks.size();
+    }
+
+    public byte[] pack() {
+        ByteBuffer headerBuf = ByteBuffer.allocate(this.getPackedHeaderSize());
+        headerBuf.put(MAGIC);
+        headerBuf.putInt(this.pallet.size());
+        headerBuf.putInt(this.blocks.size());
+        headerBuf.putShort(this.byggnadWidth);
+        headerBuf.putShort(this.byggnadHeight);
+        headerBuf.flip();
+
+        ByteBuffer palletBuf = ByteBuffer.allocate(this.getPackedPalletSize());
+
+        for (Map.Entry<ByggnadBlock, Short> entry : this.pallet.entrySet()) {
+            palletBuf.putChar(entry.getKey().pack());
+            palletBuf.putShort(entry.getValue());
+        }
+        palletBuf.flip();
+
+        ByteBuffer blocksBuf = ByteBuffer.allocate(this.getPackedBlocksSize());
+
+        for (Map.Entry<Short, RelativeLocation> entry : this.blocks.entries()) {
+            blocksBuf.putShort(entry.getKey());
+            blocksBuf.put(entry.getValue().pack());
+        }
+        blocksBuf.flip();
+
+        return Bytes.concat(headerBuf.array(), palletBuf.array(), blocksBuf.array());
+    }
+
+    public static Byggnad unpack(byte[] data) {
+        byte[] magic = new byte[MAGIC.length];
+        Map<ByggnadBlock, Short> pallet = new HashMap<>();
+        Multimap<Short, RelativeLocation> blocks = ArrayListMultimap.create();
+        ByteBuffer payload = ByteBuffer.wrap(data);
+        payload.get(magic);
+
+        if (!Arrays.equals(magic, MAGIC)) {
+            return null;
+        }
+
+        int palletSize = payload.getInt();
+        int blocksSize = payload.getInt();
+        short byggnadWidth = payload.getShort();
+        short byggnadHeight = payload.getShort();
+
+        for (int i = 0; i < palletSize; i++) {
+            pallet.put(ByggnadBlock.unpack(payload.getChar()), payload.getShort());
+        }
+
+        for (int i = 0; i < blocksSize; i++) {
+            short id = payload.getShort();
+            byte[] relativeLocationBuffer = new byte[RelativeLocation.getPackedSize()];
+            payload.get(relativeLocationBuffer);
+            blocks.put(id, RelativeLocation.unpack(relativeLocationBuffer));
+        }
+
+        return new Byggnad(pallet, blocks, byggnadWidth, byggnadHeight);
     }
 }
