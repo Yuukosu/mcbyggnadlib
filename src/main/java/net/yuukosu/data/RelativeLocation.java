@@ -1,12 +1,10 @@
 package net.yuukosu.data;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
 import org.bukkit.Location;
 
 import java.nio.ByteBuffer;
 
-@Getter
 @AllArgsConstructor
 public class RelativeLocation {
 
