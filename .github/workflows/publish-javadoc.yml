@@ -1,0 +1,28 @@
+name: Deploy Javadoc to GitHub Pages
+on:
+  push:
+    branches:
+      - main
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Javadoc
+        run: |
+          mvn javadoc:javadoc -pl mcbyggnadlib
+      - name: Upload Javadoc Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./apidocs
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/deploy-pages@v4
+        name: Deploy to GitHub Pages
+        id: deployment
