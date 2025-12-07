@@ -1,13 +1,27 @@
 # mcbyggnadlib
-Minecraft buildings data serialization library for Spigot.
 
-## Add to project
+A Spigot library for serializing and deserializing Minecraft buildings.  
+Save block data from buildings and restore them in different locations.
+
+## Features
+
+- Capture block data from specified regions
+- Binary serialization/deserialization
+- Save to and load from files
+- Generate buildings at any location
+- Lightweight and fast processing
+
+## Installation
+
+### Maven
+
 ```xml
 <repository>
     <id>jitpack.io</id>
     <url>https://www.jitpack.io/</url>
 </repository>
 ```
+
 ```xml
 <dependency>
     <groupId>com.github.Yuukosu</groupId>
@@ -16,74 +30,95 @@ Minecraft buildings data serialization library for Spigot.
 </dependency>
 ```
 
-## Examples
+## Usage Examples
 
-### Create Building Data
+### Creating Building Data
+
+Capture block data from a specified region.
 
 ```java
 import net.yuukosu.Byggnad;
-import net.yuukosu.data.ByggnadData;
+import net.yuukosu.ByggnadFactory;
+import net.yuukosu.ByggnadFactoryImpl;
 import org.bukkit.Location;
 
-public Byggnad createByggnad(Location center, Location corner1, Location corner2) {
-    return Byggnad.create(center, corner1, corner2);
-}
+// Create Byggnad from the region defined by corner1 and corner2, centered at center
+ByggnadFactory factory = ByggnadFactoryImpl.getInstance();
+Byggnad byggnad = factory.create(center, corner1, corner2);
 ```
 
-### Serialize
+### Serialization
+
+Convert building data to a byte array.
 
 ```java
-import net.yuukosu.Byggnad;
-
-public byte[] serializeBuildingData(Byggnad byggnad) {
-    return byggnad.pack();
-}
-```
-
-### Deserialize
-
-```java
-import net.yuukosu.Byggnad;
-
-public Byggnad deserializeBuildingData(byte[] serialized) {
-    return Byggnad.unpack(serialized);
-}
-```
-
-### Save to file
-
-```java
+import net.yuukosu.ByggnadSerializer;
 import net.yuukosu.ByggnadSerializerImpl;
 
-import java.io.IOException;
-
-public void save(ByggnadData byggnad) throws IOException {
-    ByggnadSerializerImpl.save(byggnad);
-}
+ByggnadSerializer serializer = ByggnadSerializerImpl.getInstance();
+byte[] serialized = serializer.toBytes(byggnad);
 ```
 
-### Load from file
+### Deserialization
+
+Restore building data from a byte array.
 
 ```java
+import net.yuukosu.ByggnadSerializer;
 import net.yuukosu.ByggnadSerializerImpl;
-import net.yuukosu.ByggnadLib;
-import net.yuukosu.Byggnad;
 
-import java.io.File;
-import java.io.IOException;
+ByggnadSerializer serializer = ByggnadSerializerImpl.getInstance();
+Byggnad byggnad = serializer.parseFrom(serialized);
+```
 
-public Byggnad loadBuildingDataFromFile(File file) throws IOException {
-    return ByggnadSerializerImpl.load(file);
+### Saving to File
+
+```java
+import net.yuukosu.ByggnadSerializer;
+import net.yuukosu.ByggnadSerializerImpl;
+import java.io.FileOutputStream;
+
+ByggnadSerializer serializer = ByggnadSerializerImpl.getInstance();
+try (FileOutputStream out = new FileOutputStream("building.dat")) {
+    serializer.write(byggnad, out);
 }
 ```
 
-### Generate a building
+### Loading from File
+
+```java
+import net.yuukosu.ByggnadSerializer;
+import net.yuukosu.ByggnadSerializerImpl;
+import java.io.FileInputStream;
+
+ByggnadSerializer serializer = ByggnadSerializerImpl.getInstance();
+try (FileInputStream in = new FileInputStream("building.dat")) {
+    Byggnad byggnad = serializer.parseFrom(in);
+}
+```
+
+### Generating Buildings
+
+Generate saved building data at a specified location.
 
 ```java
 import net.yuukosu.Byggnad;
+import net.yuukosu.ByggnadUtils;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
+import java.util.List;
 
-public void generateBuildingData(Byggnad byggnad, Location center, boolean updateChunks) {
-    byggnad.byggnad(center, updateChunks);
-}
+// Generate with chunk updates
+List<Chunk> affectedChunks = ByggnadUtils.generate(byggnad, center);
+
+// Generate without chunk updates
+List<Chunk> affectedChunks = ByggnadUtils.generate(byggnad, center, false);
 ```
+
+## License
+
+This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
+
+## Contributing
+
+Bug reports and feature requests are welcome via GitHub Issues.
