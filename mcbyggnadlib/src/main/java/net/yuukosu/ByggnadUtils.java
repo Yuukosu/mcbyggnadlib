@@ -10,12 +10,36 @@ import org.bukkit.craftbukkit.v1_8_R3.CraftChunk;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Utility class for generating building structures in the Minecraft world.
+ * <p>
+ * This class provides methods to place {@link Byggnad} structures at specified locations
+ * and optionally update the chunks for connected players.
+ * </p>
+ *
+ * @author Yuukosu
+ */
 public class ByggnadUtils {
 
+    /**
+     * Generates a building structure at the specified center location with chunk updates enabled.
+     *
+     * @param byggnad the building structure to generate
+     * @param center the center location where the building will be placed
+     * @return a list of affected chunks
+     */
     public static List<Chunk> generate(Byggnad byggnad, Location center) {
         return generate(byggnad, center, true);
     }
 
+    /**
+     * Generates a building structure at the specified center location.
+     *
+     * @param byggnad the building structure to generate
+     * @param center the center location where the building will be placed
+     * @param updateChunks whether to send chunk update packets to connected players
+     * @return a list of affected chunks
+     */
     public static List<Chunk> generate(Byggnad byggnad, Location center, boolean updateChunks) {
         List<ChunkSection> changedSections = new ArrayList<>();
         List<net.minecraft.server.v1_8_R3.Chunk> changedChunks = new ArrayList<>();
