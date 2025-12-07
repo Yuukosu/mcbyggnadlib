@@ -93,7 +93,7 @@ public class ByggnadSerializerImpl implements ByggnadSerializer {
         byte[] magic = new byte[MAGIC_HEADER.length];
         payload.get(magic);
 
-        if (!Arrays.equals(magic, MAGIC_HEADER)) return null;
+        if (!Arrays.equals(magic, MAGIC_HEADER)) throw new ByggnadException("Invalid magic header");
 
         int palletSize = payload.getInt();
         int blocksSize = payload.getInt();

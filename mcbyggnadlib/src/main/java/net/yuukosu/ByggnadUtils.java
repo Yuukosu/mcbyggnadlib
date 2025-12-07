@@ -54,7 +54,7 @@ public class ByggnadUtils {
                     int y = key.getBlockY();
                     ChunkSection section = nmsChunk.getSections()[y >> 4];
 
-                    if (null == section) section = nmsChunk.getSections()[y >> 4] = new ChunkSection(y >> 4 << 4, true);
+                    if (section == null) section = nmsChunk.getSections()[y >> 4] = new ChunkSection(y >> 4 << 4, true);
 
                     section.getIdArray()[(key.getBlockX() & 0xF) + ((key.getBlockZ() & 0xF) << 4) + ((key.getBlockY() & 0xF) << 8)]
                             = (char) (value.getBlockId() << 4 | value.getData() & 0xF);

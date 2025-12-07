@@ -46,7 +46,7 @@ public class ByggnadFactoryImpl implements ByggnadFactory {
                     ByggnadBlock byggnadBlock = new ByggnadBlock((char) block.getTypeId(), block.getData());
                     Short index = pallet.putIfAbsent(byggnadBlock, (short) pallet.size());
 
-                    if (null == index) index = (short) (pallet.size() - 1);
+                    if (index == null) index = (short) (pallet.size() - 1);
 
                     blocks.put(index, new RelativeLocation(center, location));
                 }

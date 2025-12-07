@@ -1,8 +1,8 @@
 package net.yuukosu;
 
-class ByggnadException extends RuntimeException {
+public class ByggnadException extends RuntimeException {
 
-    protected ByggnadException(String message) {
+    public ByggnadException(String message) {
         super(message);
     }
 }

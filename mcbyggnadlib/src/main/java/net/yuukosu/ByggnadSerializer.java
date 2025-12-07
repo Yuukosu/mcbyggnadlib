@@ -29,8 +29,8 @@ public interface ByggnadSerializer {
      * Deserializes a byte array into a {@link Byggnad} object.
      *
      * @param bytes the byte array to deserialize
-     * @return the deserialized building structure, or null if the data is invalid
-     * @throws ByggnadException if decompression fails
+     * @return the deserialized building structure
+     * @throws ByggnadException if decompression fails or the data is otherwise corrupt
      */
     Byggnad parseFrom(byte[] bytes);
 
