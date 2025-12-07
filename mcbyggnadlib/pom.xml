@@ -9,7 +9,7 @@
     </parent>
 
     <artifactId>mcbyggnadlib</artifactId>
-  <version>3.0.0</version>
+    <version>3.0.0</version>
 
     <developers>
         <developer>
@@ -19,9 +19,10 @@
     </developers>
 
     <scm>
+        <connection>scm:git:git@github.com:Yuukosu/mcbyggnadlib.git</connection>
+        <developerConnection>scm:git:git@github.com:Yuukosu/mcbyggnadlib.git</developerConnection>
         <url>https://github.com/Yuukosu/mcbyggnadlib</url>
-        <connection>scm:git:https://github.com/Yuukosu/mcbyggnadlib.git</connection>
-        <tag>v3.0.0-SNAPSHOT</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <properties>
