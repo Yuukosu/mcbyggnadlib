@@ -21,7 +21,7 @@ Minecraft buildings data serialization library for Spigot.
 ### Create Building Data
 
 ```java
-import net.yuukosu.data.Byggnad;
+import net.yuukosu.Byggnad;
 import net.yuukosu.data.ByggnadData;
 import org.bukkit.Location;
 
@@ -33,7 +33,7 @@ public Byggnad createByggnad(Location center, Location corner1, Location corner2
 ### Serialize
 
 ```java
-import net.yuukosu.data.Byggnad;
+import net.yuukosu.Byggnad;
 
 public byte[] serializeBuildingData(Byggnad byggnad) {
     return byggnad.pack();
@@ -43,7 +43,7 @@ public byte[] serializeBuildingData(Byggnad byggnad) {
 ### Deserialize
 
 ```java
-import net.yuukosu.data.Byggnad;
+import net.yuukosu.Byggnad;
 
 public Byggnad deserializeBuildingData(byte[] serialized) {
     return Byggnad.unpack(serialized);
@@ -53,32 +53,34 @@ public Byggnad deserializeBuildingData(byte[] serialized) {
 ### Save to file
 
 ```java
-import net.yuukosu.ByggnadLib;
+import net.yuukosu.ByggnadSerializerImpl;
+
 import java.io.IOException;
 
 public void save(ByggnadData byggnad) throws IOException {
-    ByggnadLib.save(byggnad);
+    ByggnadSerializerImpl.save(byggnad);
 }
 ```
 
 ### Load from file
 
 ```java
+import net.yuukosu.ByggnadSerializerImpl;
 import net.yuukosu.ByggnadLib;
-import net.yuukosu.data.Byggnad;
+import net.yuukosu.Byggnad;
 
 import java.io.File;
 import java.io.IOException;
 
 public Byggnad loadBuildingDataFromFile(File file) throws IOException {
-    return ByggnadLib.load(file);
+    return ByggnadSerializerImpl.load(file);
 }
 ```
 
 ### Generate a building
 
 ```java
-import net.yuukosu.data.Byggnad;
+import net.yuukosu.Byggnad;
 import org.bukkit.Location;
 
 public void generateBuildingData(Byggnad byggnad, Location center, boolean updateChunks) {
