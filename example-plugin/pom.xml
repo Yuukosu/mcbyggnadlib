@@ -4,9 +4,13 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>net.yuukosu</groupId>
-    <artifactId>ByggnadPlugin</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <parent>
+        <groupId>net.yuukosu</groupId>
+        <artifactId>mcbyggnadlib-parent</artifactId>
+        <version>3.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>example-plugin</artifactId>
 
     <developers>
         <developer>
@@ -43,8 +47,8 @@
         </dependency>
         <dependency>
             <groupId>net.yuukosu</groupId>
-            <artifactId>mcbyggnadlib</artifactId>
-            <version>2.0.3-SNAPSHOT</version>
+            <artifactId>byggnadlib</artifactId>
+            <version>2.0.4-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
@@ -53,9 +57,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.5.3</version>
+                <version>3.6.1</version>
                 <configuration>
-                    <outputFile>server/plugins/ByggnadPlugin.jar</outputFile>
+                    <outputFile>${project.basedir}/../server/plugins/ByggnadPlugin.jar</outputFile>
+                    <createDependencyReducedPom>false</createDependencyReducedPom>
                 </configuration>
                 <executions>
                     <execution>

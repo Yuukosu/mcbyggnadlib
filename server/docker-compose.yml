@@ -1,0 +1,15 @@
+services:
+  server:
+    image: itzg/minecraft-server:latest
+    ports:
+      - "25565:25565"
+    environment:
+      - "EULA=TRUE"
+      - "TYPE=PAPER"
+      - "VERSION=1.8.8"
+      - "USE_NATIVE_TRANSPORT=FALSE"
+      - "LEVEL_TYPE=FLAT"
+      - "ALLOW_NETHER=FALSE"
+    volumes:
+      - "./data:/data"
+      - "./plugins:/plugins"

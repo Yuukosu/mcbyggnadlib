@@ -1,7 +1,6 @@
 package net.yuukosu;
 
 import com.google.common.collect.ImmutableSet;
-import net.yuukosu.data.Byggnad;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -22,12 +21,14 @@ public class ByggnadCommand implements CommandExecutor, TabCompleter {
     private final ImmutableSet<String> args = ImmutableSet.of(
             "wand",
             "save",
-            "load"
+            "load",
+            "list"
     );
     private final ImmutableSet<String> usages = ImmutableSet.of(
             "/%s wand",
             "/%s save <New Byggnad Name> [<Skip Air>]",
-            "/%s load <Byggnad Name>"
+            "/%s load <Byggnad Name>",
+            "/%s list"
     );
     private static final Map<Player, Location> pos1 = new HashMap<>();
     private static final Map<Player, Location> pos2 = new HashMap<>();
@@ -50,14 +51,14 @@ public class ByggnadCommand implements CommandExecutor, TabCompleter {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         Map<String, Byggnad> byggnadList = ByggnadPlugin.getByggnadList();
 
-        if (args.length > 0) {
+        if (0 < args.length) {
             if (!(sender instanceof Player player)) {
                 sender.sendMessage("§cThis command can only be performed by players.");
                 return true;
             }
 
             if (args[0].equalsIgnoreCase("load")) {
-                if (args.length > 1) {
+                if (1 < args.length) {
                     String name = args[1].toLowerCase();
 
                     if (!byggnadList.containsKey(name)) {
@@ -66,16 +67,18 @@ public class ByggnadCommand implements CommandExecutor, TabCompleter {
                     }
 
                     player.sendMessage("§7Loading...");
+
                     Byggnad byggnad = byggnadList.get(name);
-                    byggnad.byggnad(player.getLocation(), true);
+                    ByggnadUtils.generate(byggnad, player.getLocation());
+
                     player.sendMessage("§aDone!");
-                    player.sendMessage(String.format("size: §a%,dx%,d", byggnad.getByggnadWidth(), byggnad.getByggnadHeight()));
+                    player.sendMessage(String.format("size: §a%,dx%,d", byggnad.getWidth(), byggnad.getHeight()));
                     player.playSound(player.getLocation(), Sound.NOTE_PLING, 1.0F, 2.0F);
                 } else {
                     this.printUsage(sender, command);
                 }
             } else if (args[0].equalsIgnoreCase("save")) {
-                if (args.length > 1) {
+                if (1 < args.length) {
                     String name = args[1].toLowerCase();
 
                     if (!pos1.containsKey(player) || !pos2.containsKey(player)) {
@@ -85,7 +88,7 @@ public class ByggnadCommand implements CommandExecutor, TabCompleter {
 
                     boolean skipAir = true;
 
-                    if (args.length > 2) {
+                    if (2 < args.length) {
                         try {
                             skipAir = Boolean.parseBoolean(args[2]);
                         } catch (IllegalArgumentException e) {
@@ -96,12 +99,15 @@ public class ByggnadCommand implements CommandExecutor, TabCompleter {
 
                     player.sendMessage("§7Saving...");
 
-                    Byggnad byggnad = Byggnad.createInstance(player.getLocation(), pos1.get(player), pos2.get(player), skipAir);
-                    ByggnadPlugin instance = ByggnadPlugin.getInstance();
-                    instance.addByggnad(name, byggnad);
-                    instance.saveByggnads();
+                    ByggnadFactory factory = ByggnadFactoryImpl.getInstance();
+                    Byggnad byggnad = factory.create(player.getLocation(), pos1.get(player), pos2.get(player), skipAir);
+
+                    ByggnadPlugin plugin = ByggnadPlugin.getInstance();
+                    plugin.register(name, byggnad);
+                    plugin.save();
+
                     player.sendMessage("§aDone!");
-                    player.sendMessage(String.format("size: §a%,dx%,d", byggnad.getByggnadWidth(), byggnad.getByggnadHeight()));
+                    player.sendMessage(String.format("size: §a%,dx%,d", byggnad.getWidth(), byggnad.getHeight()));
                     player.playSound(player.getLocation(), Sound.NOTE_PLING, 1.0F, 2.0F);
                 } else {
                     this.printUsage(sender, command);
@@ -109,6 +115,13 @@ public class ByggnadCommand implements CommandExecutor, TabCompleter {
             } else if (args[0].equalsIgnoreCase("wand")) {
                 ItemStack goldenAxe = new ItemStack(Material.GOLD_AXE);
                 player.getInventory().addItem(goldenAxe);
+            } else if (args[0].equalsIgnoreCase("list")) {
+                player.sendMessage("§eByggnader:");
+
+                for (Map.Entry<String, Byggnad> entry : ByggnadPlugin.getByggnadList().entrySet()) {
+                    Byggnad byggnad = entry.getValue();
+                    player.sendMessage("§7 - §b%s §7size: §b%,dx%,d".formatted(entry.getKey(), byggnad.getWidth(), byggnad.getHeight()));
+                }
             } else {
                 this.printUsage(sender, command);
             }
