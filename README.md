@@ -104,15 +104,13 @@ Generate saved building data at a specified location.
 ```java
 import net.yuukosu.Byggnad;
 import net.yuukosu.ByggnadUtils;
-import org.bukkit.Chunk;
 import org.bukkit.Location;
-import java.util.List;
 
 // Generate with chunk updates
-List<Chunk> affectedChunks = ByggnadUtils.generate(byggnad, center);
+ByggnadUtils.generate(byggnad, center);
 
 // Generate without chunk updates
-List<Chunk> affectedChunks = ByggnadUtils.generate(byggnad, center, false);
+ByggnadUtils.generate(byggnad, center, false);
 ```
 
 ## License

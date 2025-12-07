@@ -8,7 +8,9 @@ import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_8_R3.CraftChunk;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Utility class for generating building structures in the Minecraft world.
@@ -26,10 +28,9 @@ public class ByggnadUtils {
      *
      * @param byggnad the building structure to generate
      * @param center the center location where the building will be placed
-     * @return a list of affected chunks
      */
-    public static List<Chunk> generate(Byggnad byggnad, Location center) {
-        return generate(byggnad, center, true);
+    public static void generate(Byggnad byggnad, Location center) {
+        generate(byggnad, center, true);
     }
 
     /**
@@ -38,11 +39,10 @@ public class ByggnadUtils {
      * @param byggnad the building structure to generate
      * @param center the center location where the building will be placed
      * @param updateChunks whether to send chunk update packets to connected players
-     * @return a list of affected chunks
      */
-    public static List<Chunk> generate(Byggnad byggnad, Location center, boolean updateChunks) {
-        List<ChunkSection> changedSections = new ArrayList<>();
-        List<net.minecraft.server.v1_8_R3.Chunk> changedChunks = new ArrayList<>();
+    public static void generate(Byggnad byggnad, Location center, boolean updateChunks) {
+        Set<ChunkSection> changedSections = new HashSet<>();
+        Set<net.minecraft.server.v1_8_R3.Chunk> changedChunks = new HashSet<>();
 
         byggnad.getBlocks(center)
                 .forEach((key, value) -> {
@@ -75,9 +75,5 @@ public class ByggnadUtils {
                 });
             }
         }
-
-        return changedChunks.stream()
-                .map(chunk -> chunk.bukkitChunk)
-                .toList();
     }
 }
