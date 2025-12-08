@@ -46,13 +46,13 @@ public class RelativeLocation {
     }
 
     /**
-     * Converts this relative location to an absolute location based on a center point with default rotation (EAST).
+     * Converts this relative location to an absolute location based on a center point with default rotation (NORTH).
      *
      * @param center the center location to calculate from
      * @return the absolute location in the world
      */
     public Location toLocation(Location center) {
-        return this.toLocation(center, Rotation.EAST);
+        return this.toLocation(center, Rotation.NORTH);
     }
 
     /**

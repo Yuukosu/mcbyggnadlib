@@ -30,7 +30,7 @@ public class ByggnadSerializerImpl implements ByggnadSerializer {
     private ByggnadSerializerImpl() {}
 
     private char toBytes(ByggnadBlock block) {
-        return (char) (block.getBlockId() << 4 | block.getData() & 0xF);
+        return (char) ((block.getBlockId() << 4) | (block.getData() & 0xF));
     }
 
     private void writeRelativeLocation(ByteBuffer buffer, RelativeLocation location) {
@@ -100,16 +100,21 @@ public class ByggnadSerializerImpl implements ByggnadSerializer {
         short width = payload.getShort();
         short height = payload.getShort();
 
-        byte[] compressed = new byte[payload.remaining()];
-        payload.get(compressed);
+        byte[] body = new byte[payload.remaining()];
+        payload.get(body);
 
-        byte[] decompressed = new byte[palletSize * PALLET_BYTES + blocksSize * BLOCK_BYTES];
+        long code = Zstd.getFrameContentSize(body);
 
-        long code = Zstd.decompress(decompressed, compressed);
+        if (0 <= code) {
+            byte[] decompressed = new byte[palletSize * PALLET_BYTES + blocksSize * BLOCK_BYTES];
+            code = Zstd.decompress(decompressed, body);
 
-        if (Zstd.isError(code)) throw new ByggnadException("Failed to decompress data. Zstd Error Code: " + code);
+            if (Zstd.isError(code)) throw new ByggnadException("Failed to decompress data. Zstd Error Code: " + code);
 
-        payload = ByteBuffer.wrap(decompressed);
+            payload = ByteBuffer.wrap(decompressed);
+        } else {
+            payload = ByteBuffer.wrap(body);
+        }
 
         for (int i = 0; i < palletSize; i++) {
             pallet.put(this.parseFrom(payload.getChar()), payload.getShort());

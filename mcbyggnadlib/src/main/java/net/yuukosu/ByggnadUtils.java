@@ -22,13 +22,13 @@ import java.util.Set;
 public class ByggnadUtils {
 
     /**
-     * Generates a building structure at the specified center location with default rotation (EAST).
+     * Generates a building structure at the specified center location with default rotation (NORTH).
      *
      * @param byggnad the building structure to generate
      * @param center the center location where the building will be placed
      */
     public static void generate(Byggnad byggnad, Location center) {
-        generate(byggnad, center, Rotation.EAST);
+        generate(byggnad, center, Rotation.NORTH);
     }
 
     /**

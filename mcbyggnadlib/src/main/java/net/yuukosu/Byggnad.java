@@ -42,13 +42,13 @@ public class Byggnad {
     private short height;
 
     /**
-     * Retrieves the absolute locations and block information for this building with default rotation (EAST).
+     * Retrieves the absolute locations and block information for this building with default rotation (NORTH).
      *
      * @param center the center location of the building
      * @return an immutable map with absolute locations as keys and block information as values
      */
     public Map<Location, ByggnadBlock> getBlocks(Location center) {
-        return this.getBlocks(center, Rotation.EAST);
+        return this.getBlocks(center, Rotation.NORTH);
     }
 
     /**

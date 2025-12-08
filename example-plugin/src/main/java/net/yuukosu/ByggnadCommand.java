@@ -60,7 +60,7 @@ public class ByggnadCommand implements CommandExecutor, TabCompleter {
             if (args[0].equalsIgnoreCase("load")) {
                 if (1 < args.length) {
                     String name = args[1].toLowerCase();
-                    Rotation rotation = Rotation.EAST;
+                    Rotation rotation = Rotation.NORTH;
 
                     if (2 < args.length) {
                         rotation = Rotation.fromName(args[2])
