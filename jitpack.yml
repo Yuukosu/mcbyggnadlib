@@ -1,3 +1,2 @@
 install:
-  - cd mcbyggnadlib
-  - ../mvnw clean package
+  - ./mvnw clean install -pl mcbyggnadlib
