@@ -28,7 +28,7 @@ Save block data from buildings and restore them in different locations.
 <dependency>
     <groupId>com.github.Yuukosu</groupId>
     <artifactId>mcbyggnadlib</artifactId>
-    <version>v3.0.1-SNAPSHOT</version>
+    <version>v3.0.2-SNAPSHOT</version>
 </dependency>
 ```
 
