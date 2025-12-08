@@ -3,8 +3,6 @@ on:
   push:
     branches:
       - main
-    paths:
-      - mcbyggnadlib
 permissions:
   contents: read
   pages: write
