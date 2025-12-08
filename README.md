@@ -1,5 +1,7 @@
 # mcbyggnadlib
 
+[![](https://jitpack.io/v/Yuukosu/mcbyggnadlib.svg)](https://jitpack.io/#Yuukosu/mcbyggnadlib)
+
 A Spigot library for serializing and deserializing Minecraft buildings.  
 Save block data from buildings and restore them in different locations.
 
