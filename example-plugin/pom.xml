@@ -7,11 +7,10 @@
     <parent>
         <groupId>net.yuukosu</groupId>
         <artifactId>mcbyggnadlib-parent</artifactId>
-        <version>3.0.0-SNAPSHOT</version>
+        <version>3.0.1-SNAPSHOT</version>
     </parent>
 
     <artifactId>example-plugin</artifactId>
-    <version>3.0.0-SNAPSHOT</version>
 
     <developers>
         <developer>
@@ -43,7 +42,7 @@
         <dependency>
             <groupId>net.yuukosu</groupId>
             <artifactId>mcbyggnadlib</artifactId>
-            <version>3.0.0-SNAPSHOT</version>
+            <version>${parent.version}</version>
         </dependency>
     </dependencies>
 
