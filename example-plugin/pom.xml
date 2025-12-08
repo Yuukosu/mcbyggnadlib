@@ -42,7 +42,7 @@
         <dependency>
             <groupId>net.yuukosu</groupId>
             <artifactId>mcbyggnadlib</artifactId>
-            <version>${parent.version}</version>
+            <version>${project.parent.version}</version>
         </dependency>
     </dependencies>
 
