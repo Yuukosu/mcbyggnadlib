@@ -11,10 +11,6 @@ import java.util.stream.Collectors;
 
 /**
  * Represents a building structure in Minecraft.
- * <p>
- * This domain class holds block palette information and relative coordinates,
- * and generates actual block placements from a specified center location.
- * </p>
  *
  * @author Yuukosu
  */
@@ -46,15 +42,26 @@ public class Byggnad {
     private short height;
 
     /**
-     * Retrieves the absolute locations and block information for this building.
+     * Retrieves the absolute locations and block information for this building with default rotation (EAST).
      *
      * @param center the center location of the building
      * @return an immutable map with absolute locations as keys and block information as values
      */
     public Map<Location, ByggnadBlock> getBlocks(Location center) {
+        return this.getBlocks(center, Rotation.EAST);
+    }
+
+    /**
+     * Retrieves the absolute locations and block information for this building with the given rotation.
+     *
+     * @param center the center location of the building
+     * @param rotation the rotation to apply to the building structure
+     * @return an immutable map with absolute locations as keys and block information as values
+     */
+    public Map<Location, ByggnadBlock> getBlocks(Location center, Rotation rotation) {
         return this.pallet.entrySet().stream()
                 .flatMap(entry -> this.blocks.get(entry.getValue()).stream()
-                        .map(relativeLocation -> relativeLocation.toLocation(center))
+                        .map(relativeLocation -> relativeLocation.toLocation(center, rotation))
                         .map(location -> Map.entry(location, entry.getKey())))
                 .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue));
     }

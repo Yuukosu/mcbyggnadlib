@@ -27,7 +27,7 @@ public class ByggnadCommand implements CommandExecutor, TabCompleter {
     private final ImmutableSet<String> usages = ImmutableSet.of(
             "/%s wand",
             "/%s save <New Byggnad Name> [<Skip Air>]",
-            "/%s load <Byggnad Name>",
+            "/%s load <Byggnad Name> [<Rotation>]",
             "/%s list"
     );
     private static final Map<Player, Location> pos1 = new HashMap<>();
@@ -60,6 +60,12 @@ public class ByggnadCommand implements CommandExecutor, TabCompleter {
             if (args[0].equalsIgnoreCase("load")) {
                 if (1 < args.length) {
                     String name = args[1].toLowerCase();
+                    Rotation rotation = Rotation.EAST;
+
+                    if (2 < args.length) {
+                        rotation = Rotation.fromName(args[2])
+                                .orElse(rotation);
+                    }
 
                     if (!byggnadList.containsKey(name)) {
                         sender.sendMessage(String.format("§cNo byggnad data found for \"%s\".", name));
@@ -69,7 +75,7 @@ public class ByggnadCommand implements CommandExecutor, TabCompleter {
                     player.sendMessage("§7Loading...");
 
                     Byggnad byggnad = byggnadList.get(name);
-                    ByggnadUtils.generate(byggnad, player.getLocation());
+                    ByggnadUtils.generate(byggnad, player.getLocation(), rotation);
 
                     player.sendMessage("§aDone!");
                     player.sendMessage(String.format("size: §a%,dx%,d", byggnad.getWidth(), byggnad.getHeight()));
@@ -150,6 +156,6 @@ public class ByggnadCommand implements CommandExecutor, TabCompleter {
             }
         }
 
-        return this.args.stream().toList();
+        return List.copyOf(this.args);
     }
 }

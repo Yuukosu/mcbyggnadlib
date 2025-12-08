@@ -22,27 +22,39 @@ import java.util.Set;
 public class ByggnadUtils {
 
     /**
-     * Generates a building structure at the specified center location with chunk updates enabled.
+     * Generates a building structure at the specified center location with default rotation (EAST).
      *
      * @param byggnad the building structure to generate
      * @param center the center location where the building will be placed
      */
     public static void generate(Byggnad byggnad, Location center) {
-        generate(byggnad, center, true);
+        generate(byggnad, center, Rotation.EAST);
     }
 
     /**
-     * Generates a building structure at the specified center location.
+     * Generates a building structure at the specified center location with the given rotation.
      *
      * @param byggnad the building structure to generate
      * @param center the center location where the building will be placed
+     * @param rotation the rotation to apply to the building structure
+     */
+    public static void generate(Byggnad byggnad, Location center, Rotation rotation) {
+        generate(byggnad, center, rotation, true);
+    }
+
+    /**
+     * Generates a building structure at the specified center location with the given rotation.
+     *
+     * @param byggnad the building structure to generate
+     * @param center the center location where the building will be placed
+     * @param rotation the rotation to apply to the building structure
      * @param updateChunks whether to send chunk update packets to connected players
      */
-    public static void generate(Byggnad byggnad, Location center, boolean updateChunks) {
+    public static void generate(Byggnad byggnad, Location center, Rotation rotation, boolean updateChunks) {
         Set<ChunkSection> changedSections = new HashSet<>();
         Set<net.minecraft.server.v1_8_R3.Chunk> changedChunks = new HashSet<>();
 
-        byggnad.getBlocks(center)
+        byggnad.getBlocks(center, rotation)
                 .forEach((key, value) -> {
                     Chunk chunk = key.getChunk();
 

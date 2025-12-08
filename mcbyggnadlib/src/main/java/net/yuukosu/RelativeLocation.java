@@ -3,6 +3,7 @@ package net.yuukosu;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.bukkit.Location;
+import org.bukkit.World;
 
 /**
  * Represents a relative position in 3D space.
@@ -45,17 +46,33 @@ public class RelativeLocation {
     }
 
     /**
-     * Converts this relative location to an absolute location based on a center point.
+     * Converts this relative location to an absolute location based on a center point with default rotation (EAST).
      *
      * @param center the center location to calculate from
      * @return the absolute location in the world
      */
     public Location toLocation(Location center) {
-        return new Location(
-                center.getWorld(),
-                center.getBlockX() - this.relativeX,
-                center.getBlockY() - this.relativeY,
-                center.getBlockZ() - this.relativeZ
-        );
+        return this.toLocation(center, Rotation.EAST);
+    }
+
+    /**
+     * Converts this relative location to an absolute location based on a center point with the given rotation.
+     *
+     * @param center the center location to calculate from
+     * @param rotation the rotation to apply when converting to absolute location
+     * @return the absolute location in the world
+     */
+    public Location toLocation(Location center, Rotation rotation) {
+        World world = center.getWorld();
+        int centerX = center.getBlockX();
+        int centerY = center.getBlockY();
+        int centerZ = center.getBlockZ();
+
+        return switch (rotation) {
+            case EAST -> new Location(world, centerX + this.relativeZ, centerY - this.relativeY, centerZ + this.relativeX);
+            case WEST -> new Location(world, centerX - this.relativeZ, centerY - this.relativeY, centerZ - this.relativeX);
+            case SOUTH -> new Location(world, centerX + this.relativeX, centerY - this.relativeY, centerZ + this.relativeZ);
+            case NORTH -> new Location(world, centerX - this.relativeX, centerY - this.relativeY, centerZ - this.relativeZ);
+        };
     }
 }
