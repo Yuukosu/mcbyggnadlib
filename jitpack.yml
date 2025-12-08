@@ -1,4 +1,3 @@
-jdk:
-  - openjdk21
 install:
-  - ./mvnw clean package -pl mcbyggnadlib
+  - cd mcbyggnadlib
+  - ../mvnw clean package
